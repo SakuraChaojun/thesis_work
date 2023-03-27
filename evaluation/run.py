@@ -8,7 +8,7 @@ Options:
     --lr=<float>                        learning rate [default: 0.001]
     --bs=<int>                          batch size [default: 32]
     --seed=<int>                        random seed [default: 59]
-    --epochs=<int>                      number of epochs [default: 100]
+    --epochs=<int>                      number of epochs [default: 30]
     --cuda=<int>                        use GPU id [default: 0]
     --final_fc_dim=<int>                dimension of final dim [default: 50]
     --question_dim=<int>                dimension of question dim[default: 50]

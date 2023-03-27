@@ -25,6 +25,8 @@ class MODEL(nn.Module):
         self.hint_linear_final = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
         # end hint and attempt weight value
 
+
+
         self.init_memory_key = nn.Parameter(torch.randn(self.memory_size, self.memory_key_state_dim))
         nn.init.kaiming_normal_(self.init_memory_key)
 
@@ -95,14 +97,24 @@ class MODEL(nn.Module):
         hintTotal_embed_data = self.hint_total_embed(hintTotal_data)
 
         hint_weight = self.hint_linear(q_embed_data+hintTotal_embed_data)
-        weight_update = self.relu(hint_weight)
+        weight_update = self.tanh(hint_weight)
+        weight_update_2 = self.hint_linear_final(weight_update)
+        weight_final = self.sigmoid(weight_update_2)
+
+
+
+        hint_action_embed_data = self.hint_total_embed(hint_data)
+        hint_action = self.hint_linear(q_embed_data + hint_action_embed_data)
+        hint_action_update = self.relu(hint_action)
+
 
 
 
 
         # end weight value
 
-        q_embed_data = q_embed_data + time_attempt_plugin_layer_data + weight_update
+        q_embed_data = q_embed_data + time_attempt_plugin_layer_data +\
+                       (weight_final * hintTotal_embed_data)+hint_action_update
 
         qa_embed_data = self.qa_embed(qa_data)
 
