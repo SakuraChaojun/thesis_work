@@ -96,25 +96,26 @@ class MODEL(nn.Module):
         # begin hint and attempt weight value
         hintTotal_embed_data = self.hint_total_embed(hintTotal_data)
 
-        hint_weight = self.hint_linear(q_embed_data+hintTotal_embed_data)
-        weight_update = self.tanh(hint_weight)
+        hint_total_weight = self.hint_linear(q_embed_data+hintTotal_embed_data)
+        weight_update = self.tanh(hint_total_weight)
         weight_update_2 = self.hint_linear_final(weight_update)
-        weight_final = self.sigmoid(weight_update_2)
+        hint_total_final = self.sigmoid(weight_update_2)
 
 
-
-        hint_action_embed_data = self.hint_total_embed(hint_data)
-        hint_action = self.hint_linear(q_embed_data + hint_action_embed_data)
+        # input is the hint action
+        hint_action_embed_data = self.hint_total_embed(hint_data) # embedding first
+        hint_action = self.hint_linear(q_embed_data + hint_action_embed_data) # full connect the linear network
         hint_action_update = self.relu(hint_action)
 
-
-
+        # internal detector
+        internal_output = self.hint_linear_final(
+            hint_total_final * hintTotal_embed_data +
+            hint_action_update * hint_action_embed_data)
 
 
         # end weight value
 
-        q_embed_data = q_embed_data + time_attempt_plugin_layer_data +\
-                       (weight_final * hintTotal_embed_data)+hint_action_update
+        q_embed_data = q_embed_data + time_attempt_plugin_layer_data + internal_output
 
         qa_embed_data = self.qa_embed(qa_data)
 
