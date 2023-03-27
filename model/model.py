@@ -115,7 +115,9 @@ class MODEL(nn.Module):
 
         # end weight value
 
-        q_embed_data = q_embed_data + time_attempt_plugin_layer_data + internal_output
+        difficulty_total = self.tanh(internal_output + time_attempt_plugin_layer_data)
+
+        q_embed_data = q_embed_data + difficulty_total
 
         qa_embed_data = self.qa_embed(qa_data)
 
