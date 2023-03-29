@@ -89,26 +89,15 @@ class MODEL(nn.Module):
         time_second_weight = self.difficulty_linear_final(time_weight_update)
         time_final_weight = torch.sigmoid(time_second_weight)
 
-        attempt_init_weight = self.difficulty_linear(attempt_embed_data + q_embed_data)
-        attempt_weight_update = torch.tanh(attempt_init_weight)
-        attempt_second_weight = self.difficulty_linear_final(attempt_weight_update)
-        attempt_final_weight = torch.sigmoid(attempt_second_weight)
+        difficulty = self.difficulty_linear(
+            hint_total_embed_data + hint_action_embed_data + attempt_embed_data + q_embed_data)
+        difficulty_weight = torch.tanh(difficulty)
+        difficulty_weight = self.difficulty_linear_final(difficulty_weight)
+        difficulty_final = torch.sigmoid(difficulty_weight)
 
-        hint_action_init_weight = self.difficulty_linear(hint_action_embed_data + q_embed_data)
-        hint_action_weight_update = torch.tanh(hint_action_init_weight)
-        # hint_action_second_weight = self.difficulty_linear_final(hint_action_weight_update)
-        # hint_action_final_weight = torch.sigmoid(hint_action_second_weight)
+        q_embed_data = q_embed_data  + (
+                difficulty_final * (hint_action_embed_data + hint_total_embed_data + attempt_embed_data))
 
-
-        hint_total_init_weight = self.difficulty_linear(hint_total_embed_data + q_embed_data)
-        hint_total_weight_update = torch.tanh(hint_total_init_weight)
-        hint_total_second_weight = self.difficulty_linear_final(hint_total_weight_update)
-        hint_total_final_weight = torch.sigmoid(hint_total_second_weight)
-
-
-        q_embed_data = q_embed_data + (time_final_weight * time_embed_data) + (
-                    attempt_final_weight * attempt_embed_data) + (hint_action_weight_update * hint_action_embed_data)+(
-                    hint_total_final_weight * hint_total_embed_data)
 
         qa_embed_data = self.qa_embed(qa_data)
 
@@ -136,8 +125,7 @@ class MODEL(nn.Module):
 
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
-        input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1)
-
+        input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + + (time_final_weight * time_embed_data)
         predict_input = torch.cat([all_read_value_content, input_embed_content], 2)
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
 
