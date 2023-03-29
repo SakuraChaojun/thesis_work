@@ -71,33 +71,27 @@ class MODEL(nn.Module):
     def forward(self, q_data, qa_data, target, time_data, attempt_data, hint_data, hintTotal_data):
         batch_size = q_data.shape[0]
         seqlen = q_data.shape[1]
+
         q_embed_data = self.q_embed(q_data)
-
-        # begin timedata
-        # time_layer = nn.Tanh()
-        # time_embed_data_layer = time_layer(self.time_embed(time_data))
-        # end timedata
-
-        # begin difficulty linear
         time_embed_data = self.time_embed(time_data)
         attempt_embed_data = self.attempt_embed(attempt_data)
         hint_action_embed_data = self.hint_total_embed(hint_data)
         hint_total_embed_data = self.hint_total_embed(hintTotal_data)
 
+        # begin difficulty linear
         time_init_weight = self.difficulty_linear(time_embed_data + q_embed_data)
         time_weight_update = torch.tanh(time_init_weight)
         time_second_weight = self.difficulty_linear_final(time_weight_update)
         time_final_weight = torch.sigmoid(time_second_weight)
 
         difficulty = self.difficulty_linear(
-            hint_total_embed_data + hint_action_embed_data + attempt_embed_data + q_embed_data)
+            hint_total_embed_data + hint_action_embed_data + attempt_embed_data)
         difficulty_weight = torch.tanh(difficulty)
         difficulty_weight = self.difficulty_linear_final(difficulty_weight)
         difficulty_final = torch.sigmoid(difficulty_weight)
 
-        q_embed_data = self.difficulty_linear(q_embed_data  + (
+        q_embed_data = self.difficulty_linear(q_embed_data + (
                 difficulty_final * (hint_action_embed_data + hint_total_embed_data + attempt_embed_data)))
-
 
         qa_embed_data = self.qa_embed(qa_data)
 
