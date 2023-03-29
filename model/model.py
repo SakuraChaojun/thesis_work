@@ -125,7 +125,7 @@ class MODEL(nn.Module):
 
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
-        input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + + (time_final_weight * time_embed_data)
+        input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (time_final_weight * time_embed_data)
         predict_input = torch.cat([all_read_value_content, input_embed_content], 2)
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
 
