@@ -95,8 +95,8 @@ class MODEL(nn.Module):
         difficulty_weight = self.difficulty_linear_final(difficulty_weight)
         difficulty_final = torch.sigmoid(difficulty_weight)
 
-        q_embed_data = q_embed_data  + (
-                difficulty_final * (hint_action_embed_data + hint_total_embed_data + attempt_embed_data))
+        q_embed_data = self.difficulty_linear(q_embed_data  + (
+                difficulty_final * (hint_action_embed_data + hint_total_embed_data + attempt_embed_data)))
 
 
         qa_embed_data = self.qa_embed(qa_data)
