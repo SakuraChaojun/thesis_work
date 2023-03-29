@@ -121,9 +121,11 @@ class MODEL(nn.Module):
 
         input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (time_final_weight * time_embed_data)
         predict_input = torch.cat([all_read_value_content, input_embed_content], 2)
+
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
 
         pred = self.predict_linear(read_content_embed)
+
         target_1d = target.view(-1, 1)  # [batch_size * seq_len, 1]
         mask = target_1d.ge(1)  # [batch_size * seq_len, 1]
         pred_1d = pred.view(-1, 1)  # [batch_size * seq_len, 1]

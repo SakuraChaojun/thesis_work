@@ -7,7 +7,7 @@ Options:
     --questions=<int>                   num of question [default: 102]
     --lr=<float>                        learning rate [default: 0.001]
     --bs=<int>                          batch size [default: 32]
-    --seed=<int>                        random seed [default: 42]
+    --seed=<int>                        random seed [default: 13]
     --epochs=<int>                      number of epochs [default: 100]
     --cuda=<int>                        use GPU id [default: 0]
     --final_fc_dim=<int>                dimension of final dim [default: 50]
@@ -62,7 +62,7 @@ def main():
     logger.setLevel(level=logging.DEBUG)
     date = datetime.now()
     handler = logging.FileHandler(
-        f'log/{date.year}_{date.month}_{date.day}_{model_type}_2017dataset_time_result.log')
+        f'log/{date.year}_{date.month}_{date.day}_{model_type}_2017dataset_seed13_result.log')
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
