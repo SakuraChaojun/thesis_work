@@ -1,0 +1,22 @@
+2023-03-02 17:09:10,246 - main - INFO - DKVMN
+2023-03-02 17:09:10,246 - main - INFO - [('--lr', '0.001'), ('--question_dim', '50'), ('--model', 'DKVMN'), ('--final_fc_dim', '10'), ('--bs', '64'), ('--epochs', '30'), ('--question_and_answer_dim', '100'), ('--cuda', '0'), ('--questions', '110'), ('--memory_size', '20'), ('--seed', '59'), ('--length', '50')]
+2023-03-02 17:09:39,679 - main - INFO - DKVMN
+2023-03-02 17:09:39,679 - main - INFO - [('--questions', '100'), ('--final_fc_dim', '10'), ('--length', '50'), ('--seed', '59'), ('--question_dim', '50'), ('--memory_size', '20'), ('--cuda', '0'), ('--model', 'DKVMN'), ('--question_and_answer_dim', '110'), ('--lr', '0.001'), ('--bs', '64'), ('--epochs', '30')]
+2023-03-02 17:10:12,166 - main - INFO - DKVMN
+2023-03-02 17:10:12,166 - main - INFO - [('--question_dim', '50'), ('--bs', '64'), ('--question_and_answer_dim', '110'), ('--seed', '59'), ('--memory_size', '20'), ('--questions', '100'), ('--length', '50'), ('--lr', '0.001'), ('--cuda', '0'), ('--final_fc_dim', '10'), ('--model', 'DKVMN'), ('--epochs', '30')]
+2023-03-02 17:10:29,731 - main - INFO - DKVMN
+2023-03-02 17:10:29,731 - main - INFO - [('--length', '50'), ('--question_and_answer_dim', '100'), ('--epochs', '30'), ('--final_fc_dim', '10'), ('--bs', '64'), ('--cuda', '0'), ('--model', 'DKVMN'), ('--lr', '0.001'), ('--memory_size', '20'), ('--questions', '100'), ('--seed', '59'), ('--question_dim', '110')]
+2023-03-02 17:30:44,990 - main - INFO - DKVMN
+2023-03-02 17:30:44,990 - main - INFO - [('--length', '100'), ('--final_fc_dim', '10'), ('--seed', '59'), ('--lr', '0.001'), ('--question_dim', '50'), ('--question_and_answer_dim', '100'), ('--memory_size', '20'), ('--cuda', '0'), ('--model', 'DKVMN'), ('--questions', '100'), ('--epochs', '30'), ('--bs', '64')]
+2023-03-02 17:31:17,354 - main - INFO - DKVMN
+2023-03-02 17:31:17,354 - main - INFO - [('--bs', '64'), ('--cuda', '0'), ('--length', '110'), ('--question_and_answer_dim', '100'), ('--questions', '100'), ('--final_fc_dim', '10'), ('--memory_size', '20'), ('--seed', '59'), ('--model', 'DKVMN'), ('--epochs', '30'), ('--question_dim', '50'), ('--lr', '0.001')]
+2023-03-02 17:36:59,273 - main - INFO - DKVMN
+2023-03-02 17:36:59,273 - main - INFO - [('--epochs', '30'), ('--model', 'DKVMN'), ('--length', '100'), ('--cuda', '0'), ('--question_dim', '50'), ('--memory_size', '20'), ('--bs', '64'), ('--seed', '59'), ('--questions', '100'), ('--final_fc_dim', '10'), ('--question_and_answer_dim', '100'), ('--lr', '0.001')]
+2023-03-02 17:37:07,412 - main - INFO - DKVMN
+2023-03-02 17:37:07,412 - main - INFO - [('--model', 'DKVMN'), ('--epochs', '30'), ('--bs', '64'), ('--cuda', '0'), ('--seed', '59'), ('--final_fc_dim', '10'), ('--length', '10'), ('--lr', '0.001'), ('--questions', '100'), ('--question_and_answer_dim', '100'), ('--question_dim', '50'), ('--memory_size', '20')]
+2023-03-02 17:39:23,417 - main - INFO - DKVMN
+2023-03-02 17:39:23,417 - main - INFO - [('--bs', '32'), ('--epochs', '30'), ('--questions', '124'), ('--cuda', '0'), ('--question_and_answer_dim', '200'), ('--seed', '59'), ('--final_fc_dim', '10'), ('--memory_size', '20'), ('--model', 'DKVMN'), ('--lr', '0.001'), ('--length', '200'), ('--question_dim', '50')]
+2023-03-02 17:39:59,768 - main - INFO - epoch 1
+2023-03-02 17:40:04,672 - main.eval - INFO - auc: 0.7108921070146335 acc: 0.708011854593655
+2023-03-02 17:40:40,150 - main - INFO - epoch 2
+2023-03-02 17:40:45,133 - main.eval - INFO - auc: 0.7525980170062991 acc: 0.7301204216633945
