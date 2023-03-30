@@ -78,20 +78,18 @@ class MODEL(nn.Module):
         hint_action_embed_data = self.hint_total_embed(hint_data)
         hint_total_embed_data = self.hint_total_embed(hintTotal_data)
 
-        # begin difficulty linear
+        # begin time linear
         time_init_weight = self.difficulty_linear(time_embed_data + q_embed_data)
         time_weight_update = torch.tanh(time_init_weight)
         time_second_weight = self.difficulty_linear_final(time_weight_update)
         time_final_weight = torch.sigmoid(time_second_weight)
 
-        difficulty = self.difficulty_linear(
-            hint_total_embed_data + hint_action_embed_data + attempt_embed_data)
+        difficulty = self.difficulty_linear(hint_total_embed_data + hint_action_embed_data + attempt_embed_data)
         difficulty_weight = torch.tanh(difficulty)
         difficulty_weight = self.difficulty_linear_final(difficulty_weight)
         difficulty_final = torch.sigmoid(difficulty_weight)
 
-        q_embed_data = self.difficulty_linear(q_embed_data + (
-                difficulty_final * (hint_action_embed_data + hint_total_embed_data + attempt_embed_data)))
+        q_embed_data = self.difficulty_linear(q_embed_data + (difficulty_final * (hint_action_embed_data + hint_total_embed_data + attempt_embed_data)))
 
         qa_embed_data = self.qa_embed(qa_data)
 
