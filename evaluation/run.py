@@ -31,6 +31,7 @@ from docopt import docopt
 from dataloader.dataloader import getDataLoader
 from evaluation import eval
 
+# batch size 16 : auc 85.31
 
 
 def setup_seed(seed=0):
