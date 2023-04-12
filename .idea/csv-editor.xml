@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/opt/anaconda3/envs/tracing/lib/python3.8/site-packages/statsmodels/gam/tests/results/autos.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
       </map>
     </option>
   </component>

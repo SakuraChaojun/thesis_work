@@ -1,0 +1,4 @@
+2023-04-12 14:17:59,165 - main - INFO - DKVMN
+2023-04-12 14:17:59,165 - main - INFO - [('--epochs', '100'), ('--question_dim', '50'), ('--seed', '13'), ('--length', '200'), ('--model', 'DKVMN'), ('--final_fc_dim', '50'), ('--memory_size', '20'), ('--questions', '102'), ('--cuda', '0'), ('--bs', '16'), ('--lr', '0.001'), ('--question_and_answer_dim', '200')]
+2023-04-12 14:18:25,457 - main - INFO - epoch 1
+2023-04-12 14:18:28,450 - main.eval - INFO - auc: 0.8683016260670533 acc: 0.7682222147129388

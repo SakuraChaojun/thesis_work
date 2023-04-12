@@ -5,7 +5,7 @@ import os
 from sklearn import metrics
 
 logger = logging.getLogger('main.eval')
-input_parameters = 7 # 参数修改点
+input_parameters = 7  # 参数修改点
 
 
 def __load_model__(ckpt):

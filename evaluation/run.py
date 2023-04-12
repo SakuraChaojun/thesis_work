@@ -19,8 +19,8 @@ Options:
 
 import os
 import sys
-sys.path.append('../')
-# 2009 datsets question dim : 124 2017 datasets : 102
+
+sys.path.append('../')  # 2009 datasets question dim : 124 2017 datasets : 102
 import random
 import logging
 import torch
@@ -28,11 +28,12 @@ import torch.optim as optim
 import numpy as np
 from datetime import datetime
 from docopt import docopt
-from dataloader.dataloader import getDataLoader
 from evaluation import eval
+from model.model import MODEL
+from dataloader.dataloader import getDataLoader
+
 
 # batch size 16 : auc 85.31
-
 
 def setup_seed(seed=0):
     random.seed(seed)
@@ -63,7 +64,7 @@ def main():
     logger.setLevel(level=logging.DEBUG)
     date = datetime.now()
     handler = logging.FileHandler(
-        f'log/{date.year}_{date.month}_{date.day}_{model_type}_2017dataset_seed13_bs16_result.log')
+        f'log/{date.year}_{date.month}_{date.day}_{model_type}_2017dataset_result.log')
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -80,9 +81,8 @@ def main():
     else:
         device = torch.device('cpu')
 
-    trainLoader, validationLoader, testLoader = getDataLoader(bs, questions, length) # 数据加载断点
+    trainLoader, validationLoader, testLoader = getDataLoader(bs, questions, length)  # 数据加载断点
 
-    from model.model import MODEL
     model = MODEL(n_question=questions, batch_size=bs, q_embed_dim=question_dim, qa_embed_dim=question_and_answer_dim,
                   memory_size=memory_size, final_fc_dim=final_fc_dim)
 

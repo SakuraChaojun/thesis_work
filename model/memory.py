@@ -1,8 +1,9 @@
 import torch
 from torch import nn
 
-class DKVMNHeadGroup(nn.Module): #用于读写数据的读写头
-    def __init__(self, memory_size, memory_state_dim, is_write): # 定义记忆矩阵 20*50  受到超参调控 N
+
+class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
+    def __init__(self, memory_size, memory_state_dim, is_write):  # 定义记忆矩阵 20*50  受到超参调控 N
         super(DKVMNHeadGroup, self).__init__()
         """"
         Parameters
@@ -17,11 +18,11 @@ class DKVMNHeadGroup(nn.Module): #用于读写数据的读写头
                        Key matrix or Value matrix K矩阵或者V矩阵
                        Key matrix is used for calculating correlation weight(attention weight) K阵计算相关权重
         '''
-        if self.is_write: # 初始化定义key矩阵不能写入
+        if self.is_write:  # 初始化定义key矩阵不能写入
             self.erase = torch.nn.Linear(self.memory_state_dim, self.memory_state_dim, bias=True)
             self.add = torch.nn.Linear(self.memory_state_dim, self.memory_state_dim, bias=True)
 
-            nn.init.kaiming_normal_(self.erase.weight)#  初始化权重
+            nn.init.kaiming_normal_(self.erase.weight)  # 初始化权重
             nn.init.kaiming_normal_(self.add.weight)
             nn.init.constant_(self.erase.bias, 0)
             nn.init.constant_(self.add.bias, 0)
@@ -38,8 +39,9 @@ class DKVMNHeadGroup(nn.Module): #用于读写数据的读写头
             correlation_weight:     Shape (batch_size, memory_size)
         """
         # embedding_result : [batch size, memory size], each row contains each concept correlation weight for 1 question
-        similarity_score = torch.matmul(control_input, torch.t(memory)) # 计算相似性地方可以改,行列转置。然后相乘
-        correlation_weight = torch.nn.functional.softmax(similarity_score, dim=1)  # Shape: (batch_size, memory_size) softmax 方法可以改进
+        similarity_score = torch.matmul(control_input, torch.t(memory))  # 计算相似性地方可以改,行列转置。然后相乘
+        correlation_weight = torch.nn.functional.softmax(similarity_score,
+                                                         dim=1)  # Shape: (batch_size, memory_size) softmax 方法可以改进
         # Shape: (batch_size, memory_size) 归一化到0到1之间
         return correlation_weight
 
@@ -60,7 +62,7 @@ class DKVMNHeadGroup(nn.Module): #用于读写数据的读写头
         memory = memory.view(-1, self.memory_state_dim)
         rc = torch.mul(read_weight, memory)
         read_content = rc.view(-1, self.memory_size, self.memory_state_dim)
-        read_content = torch.sum(read_content, dim=1) #+ time
+        read_content = torch.sum(read_content, dim=1)  # + time
         return read_content
 
     def write(self, control_input, memory, write_weight):
@@ -128,4 +130,3 @@ class DKVMN(nn.Module):
         self.memory_value = nn.Parameter(memory_value.data)
 
         return self.memory_value
-
