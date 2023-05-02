@@ -33,8 +33,8 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         # correlation_weight: w(i) = k * key matrix (i)
         """
         Parameters
-            control_input:          Shape (batch_size, control_state_dim)
-            memory:                 Shape (memory_size, memory_state_dim)
+            control_input:          Shape (batch_size, control_state_dim) 16 * 20
+            memory:                 Shape (memory_size, memory_state_dim) 20 * 20
         Returns
             correlation_weight:     Shape (batch_size, memory_size)
         """
@@ -118,6 +118,31 @@ class DKVMN(nn.Module):
     def attention(self, control_input):
         correlation_weight = self.key_head.addressing(control_input=control_input, memory=self.memory_key)
         return correlation_weight
+
+    # def value_attention(self, control_input):
+    #     new_memory = self.memory_value
+    #     unbind_memory = torch.chunk(new_memory, 200, dim=2)
+    #     question_knowledge_corr = []
+    #     for i in range(200):
+    #         memory_value = unbind_memory[i].squeeze(2)
+    #         similarity_score = torch.matmul(control_input, torch.t(memory_value))  # 计算相似性地方可以改,行列转置。然后相乘
+    #         correlation_weight = torch.nn.functional.softmax(similarity_score, dim=0)
+    #         question_knowledge_corr.append(correlation_weight)
+    #     return question_knowledge_corr
+
+    def value_attention(self, control_input):
+        value_memory = self.memory_value
+        unbind_memory = torch.chunk(value_memory, 32, dim=0)
+        question_knowledge_corr = []
+        for i in range(32):
+            memory_value = torch.squeeze(unbind_memory[i])
+            question_descriptions = torch.squeeze(control_input[i])
+            similarity_score = torch.matmul(question_descriptions, memory_value)
+            correlation_weight = torch.nn.functional.softmax(similarity_score, dim=0)
+            question_knowledge_corr.append(correlation_weight)
+        debug = []
+
+        return question_knowledge_corr
 
     def read(self, read_weight):
         read_content = self.value_head.read(memory=self.memory_value, read_weight=read_weight)

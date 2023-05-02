@@ -74,6 +74,8 @@ class MODEL(nn.Module):
         hint_action_embed_data = self.hint_total_embed(hint_data)
         hint_total_embed_data = self.hint_total_embed(hintTotal_data)
 
+        origin_q_embed_data = q_embed_data
+
         # begin time linear
         time_init_weight = self.difficulty_linear(time_embed_data + q_embed_data)
         time_weight_update = torch.tanh(time_init_weight)
@@ -93,15 +95,31 @@ class MODEL(nn.Module):
         memory_value = nn.Parameter(torch.cat([self.init_memory_value.unsqueeze(0) for _ in range(batch_size)], 0).data)
         self.mem.init_value_memory(memory_value)
 
-        slice_q_embed_data = torch.chunk(q_embed_data, seqlen, 1)
+        slice_q_embed_data = torch.chunk(q_embed_data, seqlen, 1)  # 题目在这里已经带上难度diff作为整体
         slice_qa_embed_data = torch.chunk(qa_embed_data, seqlen, 1)
+
+        slice_origin_q_embed_data = torch.chunk(origin_q_embed_data, seqlen, 1)
 
         value_read_content_l = []
         input_embed_l = []
         for i in range(seqlen):
             # Attention
-            q = slice_q_embed_data[i].squeeze(1)  # 注意力机制改进 ？
+            q = slice_q_embed_data[i].squeeze(1)
+            q_original = slice_origin_q_embed_data[i].squeeze(1)
+            # question-concept E-C
             correlation_weight = self.mem.attention(q)
+
+            # question weight E-E
+
+            # question_score = torch.matmul(slice_origin_q_embed_data[i].squeeze(1),
+            #                               torch.t(slice_origin_q_embed_data[i].squeeze(1)))
+            # question_weight = nn.functional.softmax(question_score, dim=1)
+            # torch.reshape(question_weight,(16,20))
+
+            value_weight = self.mem.value_attention(q_original)
+            value_weight = self.mem.value_attention(q)
+
+            # correlation_weight = value_weight + correlation_weight
 
             # Read Process
             read_content = self.mem.read(correlation_weight)
@@ -115,7 +133,7 @@ class MODEL(nn.Module):
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
         input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (
-                    time_final_weight * time_embed_data)
+                time_final_weight * time_embed_data)
 
         predict_input = torch.cat([all_read_value_content, input_embed_content], 2)
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
