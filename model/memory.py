@@ -118,17 +118,6 @@ class DKVMN(nn.Module):
         correlation_weight = self.key_head.addressing(control_input=control_input, memory=self.memory_key)
         return correlation_weight
 
-    # def value_attention(self, control_input):
-    #     new_memory = self.memory_value
-    #     unbind_memory = torch.chunk(new_memory, 200, dim=2)
-    #     question_knowledge_corr = []
-    #     for i in range(200):
-    #         memory_value = unbind_memory[i].squeeze(2)
-    #         similarity_score = torch.matmul(control_input, torch.t(memory_value))  # 计算相似性地方可以改,行列转置。然后相乘
-    #         correlation_weight = torch.nn.functional.softmax(similarity_score, dim=0)
-    #         question_knowledge_corr.append(correlation_weight)
-    #     return question_knowledge_corr
-
     def value_attention(self, control_input):
         value_memory = self.memory_value
         unbind_memory = torch.chunk(value_memory, 16, dim=0)
@@ -139,13 +128,11 @@ class DKVMN(nn.Module):
             single_question = unbind_question[i].repeat(1, 4)
             value_similarityScore = torch.matmul(single_question, single_valueMemory)
             value_correlation_weight = torch.nn.functional.softmax(value_similarityScore, dim=1)
-
             question_knowledge_corr.append(value_correlation_weight)
         init_tensor = question_knowledge_corr[0]
-        for j in range(1, 16):
+        for j in range(1, len(question_knowledge_corr)):
             init_tensor = torch.cat([init_tensor, question_knowledge_corr[j]], dim=0)
         debug = []
-
         return init_tensor
 
     def read(self, read_weight):

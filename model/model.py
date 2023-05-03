@@ -120,7 +120,7 @@ class MODEL(nn.Module):
             #value_weight = self.mem.value_attention(q)
 
             debug = []
-            correlation_weight = correlation_weight
+            correlation_weight = correlation_weight + value_weight
 
             # Read Process
             read_content = self.mem.read(correlation_weight)
