@@ -40,8 +40,7 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         """
         # embedding_result : [batch size, memory size], each row contains each concept correlation weight for 1 question
         similarity_score = torch.matmul(control_input, torch.t(memory))  # 计算相似性地方可以改,行列转置。然后相乘
-        correlation_weight = torch.nn.functional.softmax(similarity_score,
-                                                         dim=1)  # Shape: (batch_size, memory_size) softmax 方法可以改进
+        correlation_weight = torch.nn.functional.softmax(similarity_score, dim=1)  # Shape: (batch_size, memory_size) softmax 方法可以改进
         # Shape: (batch_size, memory_size) 归一化到0到1之间
         return correlation_weight
 
@@ -132,17 +131,22 @@ class DKVMN(nn.Module):
 
     def value_attention(self, control_input):
         value_memory = self.memory_value
-        unbind_memory = torch.chunk(value_memory, 32, dim=0)
+        unbind_memory = torch.chunk(value_memory, 16, dim=0)
+        unbind_question = torch.chunk(control_input, 16, dim=0)
         question_knowledge_corr = []
-        for i in range(32):
-            memory_value = torch.squeeze(unbind_memory[i])
-            question_descriptions = torch.squeeze(control_input[i])
-            similarity_score = torch.matmul(question_descriptions, memory_value)
-            correlation_weight = torch.nn.functional.softmax(similarity_score, dim=0)
-            question_knowledge_corr.append(correlation_weight)
+        for i in range(len(unbind_question)):
+            single_valueMemory = torch.t(unbind_memory[i].squeeze(0))
+            single_question = unbind_question[i].repeat(1, 4)
+            value_similarityScore = torch.matmul(single_question, single_valueMemory)
+            value_correlation_weight = torch.nn.functional.softmax(value_similarityScore, dim=1)
+
+            question_knowledge_corr.append(value_correlation_weight)
+        init_tensor = question_knowledge_corr[0]
+        for j in range(1, 16):
+            init_tensor = torch.cat([init_tensor, question_knowledge_corr[j]], dim=0)
         debug = []
 
-        return question_knowledge_corr
+        return init_tensor
 
     def read(self, read_weight):
         read_content = self.value_head.read(memory=self.memory_value, read_weight=read_weight)

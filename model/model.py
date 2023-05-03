@@ -117,9 +117,10 @@ class MODEL(nn.Module):
             # torch.reshape(question_weight,(16,20))
 
             value_weight = self.mem.value_attention(q_original)
-            value_weight = self.mem.value_attention(q)
+            #value_weight = self.mem.value_attention(q)
 
-            # correlation_weight = value_weight + correlation_weight
+            debug = []
+            correlation_weight = correlation_weight
 
             # Read Process
             read_content = self.mem.read(correlation_weight)
