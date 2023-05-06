@@ -22,6 +22,7 @@ class MODEL(nn.Module):
         self.predict_linear = nn.Linear(self.final_fc_dim, 1, bias=True)
 
         self.difficulty_linear = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
+
         self.difficulty_linear_final = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
 
         # init the key memory
@@ -43,6 +44,7 @@ class MODEL(nn.Module):
         self.attempt_embed = nn.Embedding(100, self.q_embed_dim, padding_idx=0)
         self.hint_embed = nn.Embedding(2, self.q_embed_dim, padding_idx=0)
         self.hint_total_embed = nn.Embedding(60, self.q_embed_dim, padding_idx=0)
+
 
     def init_params(self):
         nn.init.kaiming_normal_(self.predict_linear.weight)
@@ -102,31 +104,28 @@ class MODEL(nn.Module):
 
         value_read_content_l = []
         input_embed_l = []
+
+        value_kt_read_content_l = []
         for i in range(seqlen):
             # Attention
             q = slice_q_embed_data[i].squeeze(1)
             q_original = slice_origin_q_embed_data[i].squeeze(1)
             # question-concept E-C
             correlation_weight = self.mem.attention(q)
-
-            # question weight E-E
-
-            # question_score = torch.matmul(slice_origin_q_embed_data[i].squeeze(1),
-            #                               torch.t(slice_origin_q_embed_data[i].squeeze(1)))
-            # question_weight = nn.functional.softmax(question_score, dim=1)
-            # torch.reshape(question_weight,(16,20))
-
-            value_weight = self.mem.value_attention(q_original)
-            #value_weight = self.mem.value_attention(q)
-
+            # value_weight = self.mem.value_attention(q_original)
+            value_weight = self.mem.value_attention(q)
+            # correlation_weight = torch.cat((correlation_weight , value_weight),0)
             debug = []
-            correlation_weight = correlation_weight + value_weight
 
             # Read Process
             read_content = self.mem.read(correlation_weight)
-            value_read_content_l.append(read_content)
-            input_embed_l.append(q)
+            read_content_valueKt = self.mem.valueRead(value_weight)
+            read_content = read_content
 
+            value_read_content_l.append(read_content)
+
+
+            input_embed_l.append(q)
             # Write Process
             qa = slice_qa_embed_data[i].squeeze(1)
             self.mem.write(correlation_weight, qa)
@@ -134,7 +133,7 @@ class MODEL(nn.Module):
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
         input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (
-                time_final_weight * time_embed_data)
+                    time_final_weight * time_embed_data)
 
         predict_input = torch.cat([all_read_value_content, input_embed_content], 2)
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))

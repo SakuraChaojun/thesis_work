@@ -58,11 +58,24 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         if read_weight is None:
             read_weight = self.addressing(control_input=control_input, memory=memory)
         read_weight = read_weight.view(-1, 1)
+        debug = []
         memory = memory.view(-1, self.memory_state_dim)
         rc = torch.mul(read_weight, memory)
         read_content = rc.view(-1, self.memory_size, self.memory_state_dim)
         read_content = torch.sum(read_content, dim=1)  # + time
         return read_content
+
+    def valueread(self, memory, control_input=None, valueread_weight=None):
+        if valueread_weight is None:
+            valueread_weight = self.value_attention(control_input = control_input, memory = memory)
+        valueread_weight = valueread_weight.view(-1, 1)
+        memory = memory.view(-1, self.memory_state_dim)
+        value_c = torch.mul(valueread_weight, memory)
+        valueread_content = value_c.view(-1, self.memory_size, self.memory_state_dim)
+        valueread_content = torch.sum(valueread_content, dim=1)
+        debug = []
+        return valueread_weight
+
 
     def write(self, control_input, memory, write_weight):
         """
@@ -138,6 +151,10 @@ class DKVMN(nn.Module):
     def read(self, read_weight):
         read_content = self.value_head.read(memory=self.memory_value, read_weight=read_weight)
         return read_content
+
+    def valueRead(self,valueread_weight):
+        valueread_content = self.value_head.valueread(memory=self.memory_value, valueread_weight= valueread_weight)
+        return valueread_content
 
     def write(self, write_weight, control_input):
         memory_value = self.value_head.write(control_input=control_input,
