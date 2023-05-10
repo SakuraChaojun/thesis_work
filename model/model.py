@@ -16,8 +16,9 @@ class MODEL(nn.Module):
         self.memory_value_state_dim = qa_embed_dim
         self.final_fc_dim = final_fc_dim
 
-        self.read_embed_linear = nn.Linear(self.memory_value_state_dim + self.memory_key_state_dim +self.memory_value_state_dim, self.final_fc_dim,
-                                           bias=True)
+        self.read_embed_linear = nn.Linear(
+            self.memory_value_state_dim + self.memory_key_state_dim + self.memory_value_state_dim, self.final_fc_dim,
+            bias=True)
 
         self.predict_linear = nn.Linear(self.final_fc_dim, 1, bias=True)
 
@@ -26,6 +27,10 @@ class MODEL(nn.Module):
         self.difficulty_linear_final = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
 
         self.dropout = nn.Dropout(0.5)
+
+        # alt linear layer
+        self.ability_linear = nn.Linear(200, 200, bias=True)
+
         # init the key memory
         self.init_memory_key = nn.Parameter(torch.randn(self.memory_size, self.memory_key_state_dim))
         nn.init.kaiming_normal_(self.init_memory_key)
@@ -46,17 +51,20 @@ class MODEL(nn.Module):
         self.hint_embed = nn.Embedding(2, self.q_embed_dim, padding_idx=0)
         self.hint_total_embed = nn.Embedding(60, self.q_embed_dim, padding_idx=0)
 
-
     def init_params(self):
         nn.init.kaiming_normal_(self.predict_linear.weight)
         nn.init.kaiming_normal_(self.read_embed_linear.weight)
         nn.init.kaiming_normal_(self.difficulty_linear.weight)
         nn.init.kaiming_normal_(self.difficulty_linear_final.weight)
 
+        nn.init.kaiming_normal_(self.ability_linear.weight)
+
+
         nn.init.constant_(self.read_embed_linear.bias, 0)
         nn.init.constant_(self.predict_linear.bias, 0)
         nn.init.constant_(self.difficulty_linear.bias, 0)
         nn.init.constant_(self.difficulty_linear_final.bias, 0)
+        nn.init.constant_(self.ability_linear.bias, 0)
 
     def init_embeddings(self):
         nn.init.kaiming_normal_(self.q_embed.weight)
@@ -134,16 +142,21 @@ class MODEL(nn.Module):
 
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
         all_read_valueKT_content = torch.cat([value_kt_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
+
+        output = self.ability_linear(all_read_valueKT_content + all_read_valueKT_content)
+        output_weight = torch.tanh(output)
+
         debug = []
 
         input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (
-                    time_final_weight * time_embed_data)
+                time_final_weight * time_embed_data)
 
+        predict_input = torch.cat([output_weight, input_embed_content], -1)
 
-        predict_input = torch.cat([all_read_value_content, input_embed_content,all_read_valueKT_content], -1)
-        predict_input = self.dropout(predict_input)
-        #drop put
-        #layer norm
+        debug = []
+        #predict_input = self.dropout(predict_input)
+        # drop put
+        # layer norm
         # linear tanh/relu/
 
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
