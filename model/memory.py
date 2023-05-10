@@ -74,7 +74,7 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         valueread_content = value_c.view(-1, self.memory_size, self.memory_state_dim)
         valueread_content = torch.sum(valueread_content, dim=1)
         debug = []
-        return valueread_weight
+        return valueread_content
 
 
     def write(self, control_input, memory, write_weight):
