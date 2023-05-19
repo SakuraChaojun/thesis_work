@@ -17,7 +17,7 @@ class MODEL(nn.Module):
         self.final_fc_dim = final_fc_dim
 
         self.read_embed_linear = nn.Linear(
-            self.memory_value_state_dim + self.memory_key_state_dim + self.memory_value_state_dim, self.final_fc_dim,
+            self.memory_value_state_dim + self.memory_key_state_dim, self.final_fc_dim,
             bias=True)
 
         self.predict_linear = nn.Linear(self.final_fc_dim, 1, bias=True)
@@ -26,7 +26,7 @@ class MODEL(nn.Module):
 
         self.difficulty_linear_final = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
 
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(0.1)
 
         # alt linear layer
         self.ability_linear = nn.Linear(200, 200, bias=True)
@@ -143,8 +143,11 @@ class MODEL(nn.Module):
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
         all_read_valueKT_content = torch.cat([value_kt_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
-        output = self.ability_linear(all_read_valueKT_content + all_read_valueKT_content)
-        output_weight = torch.tanh(output)
+        output = self.ability_linear(all_read_value_content + all_read_valueKT_content)
+        output_weight = torch.relu(output) ##
+
+        ## self.layer_norm (a+b)
+        ## self.layer_norm1(a) + self.layer2(b)
 
         debug = []
 
@@ -161,7 +164,9 @@ class MODEL(nn.Module):
 
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
 
-        pred = self.predict_linear(read_content_embed)
+        pred = self.predict_linear(read_content_embed) ## drop out
+        #pred = self.dropout(pred)
+
         target_1d = target.view(-1, 1)  # [batch_size * seq_len, 1]
         mask = target_1d.ge(1)  # [batch_size * seq_len, 1]
         pred_1d = pred.view(-1, 1)  # [batch_size * seq_len, 1]

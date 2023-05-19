@@ -10,3 +10,41 @@
 2023-05-10 10:58:19,792 - main - INFO - [('--seed', '13'), ('--bs', '16'), ('--final_fc_dim', '50'), ('--question_and_answer_dim', '200'), ('--length', '200'), ('--model', 'DKVMN'), ('--questions', '102'), ('--epochs', '100'), ('--question_dim', '50'), ('--memory_size', '20'), ('--lr', '0.001'), ('--cuda', '0')]
 2023-05-10 10:59:46,978 - main - INFO - DKVMN
 2023-05-10 10:59:46,978 - main - INFO - [('--questions', '102'), ('--lr', '0.001'), ('--question_and_answer_dim', '200'), ('--seed', '13'), ('--cuda', '0'), ('--memory_size', '20'), ('--bs', '16'), ('--epochs', '100'), ('--final_fc_dim', '50'), ('--model', 'DKVMN'), ('--question_dim', '50'), ('--length', '200')]
+2023-05-10 11:05:09,210 - main - INFO - DKVMN
+2023-05-10 11:05:09,210 - main - INFO - [('--epochs', '100'), ('--bs', '16'), ('--seed', '13'), ('--question_and_answer_dim', '200'), ('--model', 'DKVMN'), ('--memory_size', '20'), ('--cuda', '0'), ('--question_dim', '50'), ('--length', '200'), ('--questions', '102'), ('--final_fc_dim', '50'), ('--lr', '0.001')]
+2023-05-10 11:06:01,907 - main - INFO - epoch 1
+2023-05-10 11:06:07,690 - main.eval - INFO - auc: 0.8696396433227981 acc: 0.7748538505727706
+2023-05-10 11:06:54,440 - main - INFO - epoch 2
+2023-05-10 11:07:00,324 - main.eval - INFO - auc: 0.8778926796402517 acc: 0.7803027743047343
+2023-05-10 11:07:50,045 - main - INFO - DKVMN
+2023-05-10 11:07:50,045 - main - INFO - [('--model', 'DKVMN'), ('--epochs', '100'), ('--bs', '16'), ('--lr', '0.001'), ('--length', '200'), ('--final_fc_dim', '50'), ('--memory_size', '20'), ('--questions', '102'), ('--cuda', '0'), ('--question_dim', '50'), ('--seed', '13'), ('--question_and_answer_dim', '200')]
+2023-05-10 11:08:50,244 - main - INFO - epoch 1
+2023-05-10 11:08:56,671 - main.eval - INFO - auc: 0.8702583864449135 acc: 0.7740344000270334
+2023-05-10 11:09:55,307 - main - INFO - epoch 2
+2023-05-10 11:10:02,013 - main.eval - INFO - auc: 0.877522097813709 acc: 0.7802013989794884
+2023-05-10 11:11:00,558 - main - INFO - epoch 3
+2023-05-10 11:11:07,234 - main.eval - INFO - auc: 0.8791036495594029 acc: 0.7802605345858818
+2023-05-10 11:18:19,700 - main - INFO - DKVMN
+2023-05-10 11:18:19,701 - main - INFO - [('--questions', '102'), ('--question_dim', '50'), ('--question_and_answer_dim', '200'), ('--bs', '16'), ('--model', 'DKVMN'), ('--seed', '13'), ('--epochs', '100'), ('--final_fc_dim', '50'), ('--memory_size', '20'), ('--length', '200'), ('--cuda', '0'), ('--lr', '0.001')]
+2023-05-10 11:19:19,635 - main - INFO - epoch 1
+2023-05-10 11:19:26,008 - main.eval - INFO - auc: 0.7309240891507709 acc: 0.7054624404419965
+2023-05-10 11:20:22,667 - main - INFO - epoch 2
+2023-05-10 11:20:29,371 - main.eval - INFO - auc: 0.7446523051293225 acc: 0.7064508498631433
+2023-05-10 11:21:27,570 - main - INFO - epoch 3
+2023-05-10 11:21:34,131 - main.eval - INFO - auc: 0.7478467214220529 acc: 0.7080390632919947
+2023-05-10 11:22:31,256 - main - INFO - epoch 4
+2023-05-10 11:22:37,770 - main.eval - INFO - auc: 0.7340099585364018 acc: 0.7083854289865846
+2023-05-10 11:23:34,201 - main - INFO - epoch 5
+2023-05-10 11:23:40,698 - main.eval - INFO - auc: 0.7401582506471112 acc: 0.7095427972831413
+2023-05-10 11:24:38,070 - main - INFO - epoch 6
+2023-05-10 11:24:44,532 - main.eval - INFO - auc: 0.7374438545150198 acc: 0.7118490859324841
+2023-05-10 11:35:43,604 - main - INFO - DKVMN
+2023-05-10 11:35:43,604 - main - INFO - [('--question_and_answer_dim', '200'), ('--epochs', '100'), ('--memory_size', '20'), ('--questions', '102'), ('--seed', '13'), ('--lr', '0.001'), ('--question_dim', '50'), ('--length', '200'), ('--cuda', '0'), ('--model', 'DKVMN'), ('--bs', '16'), ('--final_fc_dim', '50')]
+2023-05-10 11:36:35,038 - main - INFO - epoch 1
+2023-05-10 11:36:40,790 - main.eval - INFO - auc: 0.8498704776180473 acc: 0.7601797722434359
+2023-05-10 11:37:28,470 - main - INFO - epoch 2
+2023-05-10 11:37:34,640 - main.eval - INFO - auc: 0.8591255180205557 acc: 0.7663045314770385
+2023-05-10 11:38:22,481 - main - INFO - epoch 3
+2023-05-10 11:38:28,351 - main.eval - INFO - auc: 0.8623258663014232 acc: 0.7672844929544149
+2023-05-10 11:39:16,048 - main - INFO - epoch 4
+2023-05-10 11:39:21,971 - main.eval - INFO - auc: 0.8588756015061522 acc: 0.7687121954516271
