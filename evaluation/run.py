@@ -8,7 +8,7 @@ Options:
     --lr=<float>                        learning rate [default: 0.001]
     --bs=<int>                          batch size [default: 16]
     --seed=<int>                        random seed [default: 13]
-    --epochs=<int>                      number of epochs [default: 100]
+    --epochs=<int>                      number of epochs [default: 50]
     --cuda=<int>                        use GPU id [default: 0]
     --final_fc_dim=<int>                dimension of final dim [default: 50]
     --question_dim=<int>                dimension of question dim[default: 50]
@@ -19,7 +19,6 @@ Options:
 
 import os
 import sys
-
 sys.path.append('../')  # 2009 datasets question dim : 124 2017 datasets : 102
 import random
 import logging

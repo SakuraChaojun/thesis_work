@@ -26,7 +26,7 @@ class MODEL(nn.Module):
 
         self.difficulty_linear_final = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
 
-        self.dropout = nn.Dropout(0.1)
+        self.dropout = nn.Dropout(0.5)
 
         # alt linear layer
         self.ability_linear = nn.Linear(200, 200, bias=True)
@@ -58,7 +58,6 @@ class MODEL(nn.Module):
         nn.init.kaiming_normal_(self.difficulty_linear_final.weight)
 
         nn.init.kaiming_normal_(self.ability_linear.weight)
-
 
         nn.init.constant_(self.read_embed_linear.bias, 0)
         nn.init.constant_(self.predict_linear.bias, 0)
@@ -93,13 +92,14 @@ class MODEL(nn.Module):
         time_second_weight = self.difficulty_linear_final(time_weight_update)
         time_final_weight = torch.sigmoid(time_second_weight)
 
+        # begin difficulty layer
         difficulty = self.difficulty_linear(hint_total_embed_data + hint_action_embed_data + attempt_embed_data)
         difficulty_weight = torch.tanh(difficulty)
         difficulty_weight = self.difficulty_linear_final(difficulty_weight)
         difficulty_final = torch.sigmoid(difficulty_weight)
 
         q_embed_data = self.difficulty_linear(
-            q_embed_data + (difficulty_final * (hint_action_embed_data + hint_total_embed_data + attempt_embed_data)))
+            q_embed_data + (difficulty_final * (hint_total_embed_data + hint_action_embed_data + attempt_embed_data)))
 
         qa_embed_data = self.qa_embed(qa_data)
 
@@ -144,7 +144,12 @@ class MODEL(nn.Module):
         all_read_valueKT_content = torch.cat([value_kt_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
         output = self.ability_linear(all_read_value_content + all_read_valueKT_content)
-        output_weight = torch.relu(output) ##
+
+        # output_value = nn.functional.layer_norm(all_read_value_content, (16, 200, 200))
+        # output_valueKT = nn.functional.layer_norm(all_read_valueKT_content, (16, 200, 200))
+        # output = output_value + output_valueKT
+        output_weight = torch.tanh(output)  ##
+        #output_weight = self.dropout(output_weight)
 
         ## self.layer_norm (a+b)
         ## self.layer_norm1(a) + self.layer2(b)
@@ -157,15 +162,15 @@ class MODEL(nn.Module):
         predict_input = torch.cat([output_weight, input_embed_content], -1)
 
         debug = []
-        #predict_input = self.dropout(predict_input)
+        # predict_input = self.dropout(predict_input)
         # drop put
         # layer norm
         # linear tanh/relu/
 
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
 
-        pred = self.predict_linear(read_content_embed) ## drop out
-        #pred = self.dropout(pred)
+        pred = self.predict_linear(read_content_embed)  ## drop out
+        # pred = self.dropout(pred)
 
         target_1d = target.view(-1, 1)  # [batch_size * seq_len, 1]
         mask = target_1d.ge(1)  # [batch_size * seq_len, 1]
