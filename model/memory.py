@@ -148,6 +148,10 @@ class DKVMN(nn.Module):
         debug = []
         return init_tensor
 
+    def kt_self_read(self):
+        kt_self_memory = self.memory_key
+        return kt_self_memory
+
     def read(self, read_weight):
         read_content = self.value_head.read(memory=self.memory_value, read_weight=read_weight)
         return read_content

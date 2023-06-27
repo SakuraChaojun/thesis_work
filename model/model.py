@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from model.memory import DKVMN
 
-
 class MODEL(nn.Module):
 
     def __init__(self, n_question, batch_size, q_embed_dim, qa_embed_dim, memory_size, final_fc_dim):
@@ -23,13 +22,15 @@ class MODEL(nn.Module):
         self.predict_linear = nn.Linear(self.final_fc_dim, 1, bias=True)
 
         self.difficulty_linear = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
-
         self.difficulty_linear_final = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
 
-        self.dropout = nn.Dropout(0.5)
-
+        self.keyweight_linear = nn.Linear(200, 200, bias=True)
+        self.valueweight_linear = nn.Linear(200, 200, bias=True)
+        self.keyselfweight_linear = nn.Linear(200, 200, bias=True)
         # alt linear layer
         self.ability_linear = nn.Linear(200, 200, bias=True)
+
+        self.dropout = nn.Dropout(0.5)
 
         # init the key memory
         self.init_memory_key = nn.Parameter(torch.randn(self.memory_size, self.memory_key_state_dim))
@@ -57,13 +58,19 @@ class MODEL(nn.Module):
         nn.init.kaiming_normal_(self.difficulty_linear.weight)
         nn.init.kaiming_normal_(self.difficulty_linear_final.weight)
 
-        nn.init.kaiming_normal_(self.ability_linear.weight)
+        nn.init.xavier_normal_(self.ability_linear.weight)
+        nn.init.xavier_normal_(self.keyweight_linear.weight)
+        nn.init.xavier_normal_(self.keyselfweight_linear.weight)
+        nn.init.xavier_normal_(self.valueweight_linear.weight)
 
         nn.init.constant_(self.read_embed_linear.bias, 0)
         nn.init.constant_(self.predict_linear.bias, 0)
         nn.init.constant_(self.difficulty_linear.bias, 0)
         nn.init.constant_(self.difficulty_linear_final.bias, 0)
         nn.init.constant_(self.ability_linear.bias, 0)
+        nn.init.constant_(self.valueweight_linear.bias, 0)
+        nn.init.constant_(self.keyweight_linear.bias, 0)
+        nn.init.constant_(self.keyselfweight_linear.bias,0)
 
     def init_embeddings(self):
         nn.init.kaiming_normal_(self.q_embed.weight)
@@ -112,9 +119,11 @@ class MODEL(nn.Module):
         slice_origin_q_embed_data = torch.chunk(origin_q_embed_data, seqlen, 1)
 
         value_read_content_l = []
+        value_kt_read_content_l = []
+        kt_self_read_content_l = []
+
         input_embed_l = []
 
-        value_kt_read_content_l = []
         for i in range(seqlen):
             # Attention
             q = slice_q_embed_data[i].squeeze(1)
@@ -124,6 +133,8 @@ class MODEL(nn.Module):
             # value_weight = self.mem.value_attention(q_original)
             value_weight = self.mem.value_attention(q)
             # correlation_weight = torch.cat((correlation_weight , value_weight),0)
+
+
             debug = []
 
             # Read Process
@@ -143,18 +154,16 @@ class MODEL(nn.Module):
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
         all_read_valueKT_content = torch.cat([value_kt_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
-        output = self.ability_linear(all_read_value_content + all_read_valueKT_content)
+        all_read_value_content = self.keyweight_linear(all_read_value_content)
+        all_read_valueKT_content = self.valueweight_linear(all_read_valueKT_content)
 
-        # output_value = nn.functional.layer_norm(all_read_value_content, (16, 200, 200))
-        # output_valueKT = nn.functional.layer_norm(all_read_valueKT_content, (16, 200, 200))
-        # output = output_value + output_valueKT
-        output_weight = torch.tanh(output)  ##
-        #output_weight = self.dropout(output_weight)
+        all_read_kt_self = self.mem.kt_self_read()
+        all_read_kt_self = all_read_kt_self.unsqueeze(0)
+        all_read_kt_self = all_read_kt_self.repeat(16,10,4)
+        all_read_kt_self = self.keyselfweight_linear(all_read_kt_self)
 
-        ## self.layer_norm (a+b)
-        ## self.layer_norm1(a) + self.layer2(b)
-
-        debug = []
+        #output = self.ability_linear(all_read_kt_self)
+        output_weight = torch.tanh(all_read_value_content+all_read_valueKT_content)
 
         input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (
                 time_final_weight * time_embed_data)
