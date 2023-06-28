@@ -134,15 +134,11 @@ class MODEL(nn.Module):
             value_weight = self.mem.value_attention(q)
             # correlation_weight = torch.cat((correlation_weight , value_weight),0)
 
-
             debug = []
 
             # Read Process
             read_content = self.mem.read(correlation_weight)
             read_content_value = self.mem.valueRead(value_weight)
-            read_content = read_content
-            read_content_value = read_content_value
-
             value_read_content_l.append(read_content)
             value_kt_read_content_l.append(read_content_value)
 
@@ -160,10 +156,15 @@ class MODEL(nn.Module):
         all_read_kt_self = self.mem.kt_self_read()
         all_read_kt_self = all_read_kt_self.unsqueeze(0)
         all_read_kt_self = all_read_kt_self.repeat(16,10,4)
+
         all_read_kt_self = self.keyselfweight_linear(all_read_kt_self)
 
         #output = self.ability_linear(all_read_kt_self)
-        output_weight = torch.tanh(all_read_value_content+all_read_valueKT_content)
+
+        value_norm = nn.LayerNorm([200,200])
+        all_read_valueKT_content = value_norm(all_read_valueKT_content)
+
+        output_weight = torch.sigmoid(all_read_value_content+all_read_valueKT_content)
 
         input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (
                 time_final_weight * time_embed_data)
