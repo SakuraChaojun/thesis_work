@@ -24,7 +24,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/raw_data/assist_2009_train_time.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data/raw_data/assist_2017_train_time.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/raw_data/features_2009_data.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

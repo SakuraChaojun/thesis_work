@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 
-
 class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
     def __init__(self, memory_size, memory_state_dim, is_write):  # 定义记忆矩阵 20*50  受到超参调控 N
         super(DKVMNHeadGroup, self).__init__()
@@ -76,7 +75,6 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         debug = []
         return valueread_content
 
-
     def write(self, control_input, memory, write_weight):
         """
         Parameters
@@ -96,7 +94,6 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         add_mul = torch.mul(add_reshape, write_weight_reshape)
         new_memory = memory * (1 - erase_mult) + add_mul
         return new_memory
-
 
 class DKVMN(nn.Module):
     def __init__(self, memory_size, memory_key_state_dim, memory_value_state_dim, init_memory_key):
@@ -147,10 +144,6 @@ class DKVMN(nn.Module):
             init_tensor = torch.cat([init_tensor, question_knowledge_corr[j]], dim=0)
         debug = []
         return init_tensor
-
-    def kt_self_read(self):
-        kt_self_memory = self.memory_key
-        return kt_self_memory
 
     def read(self, read_weight):
         read_content = self.value_head.read(memory=self.memory_value, read_weight=read_weight)
