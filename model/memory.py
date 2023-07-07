@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 
+
 class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
     def __init__(self, memory_size, memory_state_dim, is_write):  # 定义记忆矩阵 20*50  受到超参调控 N
         super(DKVMNHeadGroup, self).__init__()
@@ -39,7 +40,8 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         """
         # embedding_result : [batch size, memory size], each row contains each concept correlation weight for 1 question
         similarity_score = torch.matmul(control_input, torch.t(memory))  # 计算相似性地方可以改,行列转置。然后相乘
-        correlation_weight = torch.nn.functional.softmax(similarity_score, dim=1)  # Shape: (batch_size, memory_size) softmax 方法可以改进
+        correlation_weight = torch.nn.functional.softmax(similarity_score,
+                                                         dim=1)  # Shape: (batch_size, memory_size) softmax 方法可以改进
         # Shape: (batch_size, memory_size) 归一化到0到1之间
         return correlation_weight
 
@@ -66,7 +68,7 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
 
     def valueread(self, memory, control_input=None, valueread_weight=None):
         if valueread_weight is None:
-            valueread_weight = self.value_attention(control_input = control_input, memory = memory)
+            valueread_weight = self.value_attention(control_input=control_input, memory=memory)
         valueread_weight = valueread_weight.view(-1, 1)
         memory = memory.view(-1, self.memory_state_dim)
         value_c = torch.mul(valueread_weight, memory)
@@ -94,6 +96,7 @@ class DKVMNHeadGroup(nn.Module):  # 用于读写数据的读写头
         add_mul = torch.mul(add_reshape, write_weight_reshape)
         new_memory = memory * (1 - erase_mult) + add_mul
         return new_memory
+
 
 class DKVMN(nn.Module):
     def __init__(self, memory_size, memory_key_state_dim, memory_value_state_dim, init_memory_key):
@@ -149,8 +152,8 @@ class DKVMN(nn.Module):
         read_content = self.value_head.read(memory=self.memory_value, read_weight=read_weight)
         return read_content
 
-    def valueRead(self,valueread_weight):
-        valueread_content = self.value_head.valueread(memory=self.memory_value, valueread_weight= valueread_weight)
+    def valueRead(self, valueread_weight):
+        valueread_content = self.value_head.valueread(memory=self.memory_value, valueread_weight=valueread_weight)
         return valueread_content
 
     def write(self, write_weight, control_input):

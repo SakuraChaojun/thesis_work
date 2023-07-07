@@ -4,11 +4,11 @@ Usage:
 
 Options:
     --length=<int>                      max length of question sequence [default: 200]
-    --questions=<int>                   num of question [default: 102]
+    --questions=<int>                   num of question [default: 124]
     --lr=<float>                        learning rate [default: 0.001]
     --bs=<int>                          batch size [default: 16]
     --seed=<int>                        random seed [default: 13]
-    --epochs=<int>                      number of epochs [default: 30]
+    --epochs=<int>                      number of epochs [default: 1]
     --cuda=<int>                        use GPU id [default: 0]
     --final_fc_dim=<int>                dimension of final dim [default: 50]
     --question_dim=<int>                dimension of question dim[default: 50]
@@ -19,6 +19,7 @@ Options:
 
 import os
 import sys
+
 sys.path.append('../')  # 2009 datasets question dim : 124 2017 datasets : 102
 import random
 import logging
@@ -31,8 +32,6 @@ from evaluation import eval
 from model.model import MODEL
 from dataloader.dataloader import getDataLoader
 
-
-# batch size 16 : auc 85.31
 
 def setup_seed(seed=0):
     random.seed(seed)
@@ -63,7 +62,7 @@ def main():
     logger.setLevel(level=logging.DEBUG)
     date = datetime.now()
     handler = logging.FileHandler(
-        f'log/{date.year}_{date.month}_{date.day}_{model_type}_2017dataset_result.log')
+        f'log/{date.year}_{date.month}_{date.day}_{model_type}_2009_dataset_result.log')
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')

@@ -2,26 +2,23 @@ import torch
 import torch.nn as nn
 from model.memory import DKVMN
 
+
 class MODEL(nn.Module):
 
     def __init__(self, n_question, batch_size, q_embed_dim, qa_embed_dim, memory_size, final_fc_dim):
         super(MODEL, self).__init__()
         self.n_question = n_question
         self.batch_size = batch_size
-
         self.q_embed_dim = q_embed_dim
         self.qa_embed_dim = qa_embed_dim
-
         self.memory_size = memory_size  # memory size
         self.memory_key_state_dim = q_embed_dim
         self.memory_value_state_dim = qa_embed_dim
-
         self.final_fc_dim = final_fc_dim
 
         self.read_embed_linear = nn.Linear(
             self.memory_value_state_dim + self.memory_key_state_dim, self.final_fc_dim,
             bias=True)
-
         self.predict_linear = nn.Linear(self.final_fc_dim, 1, bias=True)
 
         self.difficulty_linear = nn.Linear(self.q_embed_dim, self.q_embed_dim, bias=True)
@@ -43,8 +40,9 @@ class MODEL(nn.Module):
 
         self.q_embed = nn.Embedding(self.n_question + 1, self.q_embed_dim, padding_idx=0)  # A matrix
         self.qa_embed = nn.Embedding(2 * self.n_question + 1, self.qa_embed_dim, padding_idx=0)  # B matrix
-        self.time_embed = nn.Embedding(4960, self.q_embed_dim, padding_idx=0)  # 102 for 2017 datasets
-        self.attempt_embed = nn.Embedding(100, self.q_embed_dim, padding_idx=0)
+        self.time_embed = nn.Embedding(9902, self.q_embed_dim,
+                                       padding_idx=0)  # 4960 for 2017 datasets  #time_2009_ 9902
+        self.attempt_embed = nn.Embedding(4000, self.q_embed_dim, padding_idx=0)  # 100 for 2017   4000 for 2009
         self.hint_embed = nn.Embedding(2, self.q_embed_dim, padding_idx=0)
         self.hint_total_embed = nn.Embedding(60, self.q_embed_dim, padding_idx=0)
 
@@ -53,7 +51,6 @@ class MODEL(nn.Module):
         nn.init.kaiming_normal_(self.read_embed_linear.weight)
         nn.init.kaiming_normal_(self.difficulty_linear.weight)
         nn.init.kaiming_normal_(self.difficulty_linear_final.weight)
-
         nn.init.xavier_normal_(self.keyweight_linear.weight)
         nn.init.xavier_normal_(self.valueweight_linear.weight)
 
@@ -75,7 +72,6 @@ class MODEL(nn.Module):
     def forward(self, q_data, qa_data, target, time_data, attempt_data, hint_data, hintTotal_data):
         batch_size = q_data.shape[0]
         seqlen = q_data.shape[1]
-
         q_embed_data = self.q_embed(q_data)
         time_embed_data = self.time_embed(time_data)
         attempt_embed_data = self.attempt_embed(attempt_data)
@@ -97,20 +93,16 @@ class MODEL(nn.Module):
 
         q_embed_data = self.difficulty_linear(
             q_embed_data + (difficulty_final * (hint_total_embed_data + hint_action_embed_data + attempt_embed_data)))
-
         qa_embed_data = self.qa_embed(qa_data)
-
         memory_value = nn.Parameter(torch.cat([self.init_memory_value.unsqueeze(0) for _ in range(batch_size)], 0).data)
         self.mem.init_value_memory(memory_value)
 
         slice_q_embed_data = torch.chunk(q_embed_data, seqlen, 1)  # 题目在这里已经带上难度diff作为整体
         slice_qa_embed_data = torch.chunk(qa_embed_data, seqlen, 1)
-
         slice_origin_q_embed_data = torch.chunk(origin_q_embed_data, seqlen, 1)
 
         value_read_content_l = []
         value_kt_read_content_l = []
-
         input_embed_l = []
 
         for i in range(seqlen):
@@ -125,8 +117,8 @@ class MODEL(nn.Module):
             read_content_value = self.mem.valueRead(value_weight)
             value_read_content_l.append(read_content)
             value_kt_read_content_l.append(read_content_value)
-
             input_embed_l.append(q)
+
             # Write Process
             qa = slice_qa_embed_data[i].squeeze(1)
             self.mem.write(correlation_weight, qa)
@@ -137,8 +129,8 @@ class MODEL(nn.Module):
         all_read_value_content = self.keyweight_linear(all_read_value_content)
         all_read_valueKT_content = self.valueweight_linear(all_read_valueKT_content)
 
-        value_norm = nn.LayerNorm([200,200])
-        kt_norm = nn.LayerNorm([200,200])
+        value_norm = nn.LayerNorm([200, 200])
+        kt_norm = nn.LayerNorm([200, 200])
 
         all_read_valueKT_content = value_norm(all_read_valueKT_content)
         all_read_value_content = kt_norm(all_read_value_content)
@@ -149,9 +141,7 @@ class MODEL(nn.Module):
                 time_final_weight * time_embed_data)
 
         predict_input = torch.cat([output_weight, input_embed_content], -1)
-
         read_content_embed = torch.tanh(self.read_embed_linear(predict_input.view(batch_size * seqlen, -1)))
-
         pred = self.predict_linear(read_content_embed)
 
         target_1d = target.view(-1, 1)  # [batch_size * seq_len, 1]

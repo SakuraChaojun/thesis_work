@@ -3,13 +3,15 @@ from torch.utils import data
 from .readdata_new import DataReader
 
 # assist2015/assist2015_train.txt assist2015/assist2015_test.txt
-# assist2017/assist2017_train.txt assist2017/assist2017_test.txt
+# assist2017/assist2017_train.txt assist2017/assist2017_test.txt question:102
 # assist2009/builder_train.csv assist2009/builder_test.csv    question_dim : 124
 
+# pathway:../data/raw_data/assist_2017_test_time.csv
+# pathway: ../dataloader/assist_2009_train_time.csv
 
 def getDataLoader(batch_size, num_of_questions, max_step):
-    handle = DataReader('../data/raw_data/assist_2017_train_time.csv',
-                        '../data/raw_data/assist_2017_test_time.csv', max_step,
+    handle = DataReader('../dataloader/assist_2009_train_time.csv',
+                        '../dataloader/assist_2009_test_time.csv', max_step,
                         num_of_questions)
 
     train, vali = handle.getTrainData()
