@@ -10,8 +10,8 @@ from .readdata_new import DataReader
 # pathway: ../dataloader/assist_2009_train_time.csv
 
 def getDataLoader(batch_size, num_of_questions, max_step):
-    handle = DataReader('../dataloader/assist_2009_train_time.csv',
-                        '../dataloader/assist_2009_test_time.csv', max_step,
+    handle = DataReader('../data/raw_data/assist_2017_train_time.csv',
+                        '../data/raw_data/assist_2017_test_time.csv', max_step,
                         num_of_questions)
 
     train, vali = handle.getTrainData()

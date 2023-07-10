@@ -145,7 +145,6 @@ class DKVMN(nn.Module):
         init_tensor = question_knowledge_corr[0]
         for j in range(1, len(question_knowledge_corr)):
             init_tensor = torch.cat([init_tensor, question_knowledge_corr[j]], dim=0)
-        debug = []
         return init_tensor
 
     def read(self, read_weight):
