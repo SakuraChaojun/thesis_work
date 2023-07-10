@@ -1,0 +1,2 @@
+2023-07-10 17:56:44,972 - main - INFO - DKVMN
+2023-07-10 17:56:44,972 - main - INFO - [('--length', '200'), ('--epochs', '23'), ('--question_and_answer_dim', '200'), ('--cuda', '0'), ('--question_dim', '50'), ('--questions', '102'), ('--model', 'DKVMN'), ('--memory_size', '20'), ('--bs', '16'), ('--seed', '13'), ('--final_fc_dim', '50'), ('--lr', '0.001')]
