@@ -43,8 +43,8 @@ class MODEL(nn.Module):
 
         self.q_embed = nn.Embedding(self.n_question + 1, self.q_embed_dim, padding_idx=0)  # A matrix
         self.qa_embed = nn.Embedding(2 * self.n_question + 1, self.qa_embed_dim, padding_idx=0)  # B matrix
-        self.time_embed = nn.Embedding(4960, self.q_embed_dim, padding_idx=0)  # 102 for 2017 datasets
-        self.attempt_embed = nn.Embedding(100, self.q_embed_dim, padding_idx=0)
+        self.time_embed = nn.Embedding(9902, self.q_embed_dim, padding_idx=0)  # 102 for 2017 datasets
+        self.attempt_embed = nn.Embedding(4000, self.q_embed_dim, padding_idx=0)
         self.hint_embed = nn.Embedding(2, self.q_embed_dim, padding_idx=0)
         self.hint_total_embed = nn.Embedding(60, self.q_embed_dim, padding_idx=0)
 
@@ -117,8 +117,8 @@ class MODEL(nn.Module):
             # Attention
             q = slice_q_embed_data[i].squeeze(1)
             q_original = slice_origin_q_embed_data[i].squeeze(1)
-            correlation_weight = self.mem.attention(q)
-            value_weight = self.mem.value_attention(q)
+            correlation_weight = self.mem.attention(q_original)
+            value_weight = self.mem.value_attention(q_original)
 
             # Read Process
             read_content = self.mem.read(correlation_weight)
@@ -126,27 +126,26 @@ class MODEL(nn.Module):
             value_read_content_l.append(read_content)
             value_kt_read_content_l.append(read_content_value)
 
-            input_embed_l.append(q)
+            input_embed_l.append(q_original)
             # Write Process
             qa = slice_qa_embed_data[i].squeeze(1)
             self.mem.write(correlation_weight, qa)
 
         all_read_value_content = torch.cat([value_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
-        all_read_valueKT_content = torch.cat([value_kt_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
+        #all_read_valueKT_content = torch.cat([value_kt_read_content_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
-        all_read_value_content = self.keyweight_linear(all_read_value_content)
-        all_read_valueKT_content = self.valueweight_linear(all_read_valueKT_content)
+        #all_read_value_content = self.keyweight_linear(all_read_value_content)
+        #all_read_valueKT_content = self.valueweight_linear(all_read_valueKT_content)
 
         value_norm = nn.LayerNorm([200,200])
         kt_norm = nn.LayerNorm([200,200])
 
-        all_read_valueKT_content = value_norm(all_read_valueKT_content)
-        all_read_value_content = kt_norm(all_read_value_content)
+        #all_read_valueKT_content = value_norm(all_read_valueKT_content)
+        #all_read_value_content = kt_norm(all_read_value_content)
 
-        output_weight = torch.sigmoid(all_read_value_content + all_read_valueKT_content)
+        output_weight = torch.sigmoid(all_read_value_content)
 
-        input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1) + (
-                time_final_weight * time_embed_data)
+        input_embed_content = torch.cat([input_embed_l[i].unsqueeze(1) for i in range(seqlen)], 1)
 
         predict_input = torch.cat([output_weight, input_embed_content], -1)
 
