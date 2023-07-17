@@ -4,7 +4,7 @@ Usage:
 
 Options:
     --length=<int>                      max length of question sequence [default: 200]
-    --questions=<int>                   num of question [default: 124]
+    --questions=<int>                   num of question [default: 102]
     --lr=<float>                        learning rate [default: 0.001]
     --bs=<int>                          batch size [default: 16]
     --seed=<int>                        random seed [default: 13]

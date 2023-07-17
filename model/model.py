@@ -140,6 +140,7 @@ class MODEL(nn.Module):
         value_norm = nn.LayerNorm([200,200])
         kt_norm = nn.LayerNorm([200,200])
 
+
         #all_read_valueKT_content = value_norm(all_read_valueKT_content)
         #all_read_value_content = kt_norm(all_read_value_content)
 
