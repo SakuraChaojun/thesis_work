@@ -4,11 +4,11 @@ Usage:
 
 Options:
     --length=<int>                      max length of question sequence [default: 200]
-    --questions=<int>                   num of question [default: 102]
+    --questions=<int>                   num of question [default: 124]
     --lr=<float>                        learning rate [default: 0.001]
     --bs=<int>                          batch size [default: 32]
     --seed=<int>                        random seed [default: 42]
-    --epochs=<int>                      number of epochs [default: 100]
+    --epochs=<int>                      number of epochs [default: 30]
     --cuda=<int>                        use GPU id [default: 0]
     --final_fc_dim=<int>                dimension of final dim [default: 50]
     --question_dim=<int>                dimension of question dim[default: 50]

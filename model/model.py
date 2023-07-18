@@ -39,8 +39,8 @@ class MODEL(nn.Module):
         self.q_embed = nn.Embedding(self.n_question + 1, self.q_embed_dim, padding_idx=0)  # A matrix
         self.qa_embed = nn.Embedding(2 * self.n_question + 1, self.qa_embed_dim, padding_idx=0)  # B matrix
 
-        self.time_embed = nn.Embedding(4960, self.q_embed_dim, padding_idx=0)  # 102 for 2017 datasets
-        self.attempt_embed = nn.Embedding(100, self.q_embed_dim, padding_idx=0)
+        self.time_embed = nn.Embedding(9902, self.q_embed_dim, padding_idx=0)  # 102 for 2017 datasets
+        self.attempt_embed = nn.Embedding(4000, self.q_embed_dim, padding_idx=0)
         # hint, hint_total,
         self.hint_embed = nn.Embedding(2, self.q_embed_dim, padding_idx=0)
         self.hint_total_embed = nn.Embedding(60, self.q_embed_dim, padding_idx=0)
